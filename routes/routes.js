@@ -11,5 +11,8 @@ router.delete('/delete/:name', fileController.deleteFile);
 // Ruta para renombrar archivos
 router.put('/rename', fileController.renameFile);
 
+router.post('/notify-directory', fileController.notifyDirectory);
+
+
 
 module.exports = router;

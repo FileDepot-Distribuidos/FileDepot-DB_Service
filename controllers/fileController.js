@@ -22,6 +22,13 @@ exports.deleteFile = (req, res) => {
     });
 };
 
+exports.notifyDirectory = (req, res) => {
+    const { path } = req.body;
+    console.log(`Directorio creado en '${path}'`);
+    res.status(200).json({ message: 'Notificación recibida correctamente' });
+};
+
+
 exports.renameFile = (req, res) => {
     const { oldFileName, newFileName } = req.body;
 
