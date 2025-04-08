@@ -1,10 +1,10 @@
 const db = require('../config/db');
 
 class File {
-    static create({ name, type, size, creation_date, last_modified, hash }, callback) {
+    static create({ name, type, size, creation_date, last_modified, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY }, callback) {
         db.query(
-            'INSERT INTO file (name, type, size, creation_date, last_modified, hash) VALUES (?, ?, ?, ?, ?, ?)',
-            [name, type, size, creation_date, last_modified, hash],
+            'INSERT INTO file (name, type, size, creation_date, last_modified, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [name, type, size, creation_date, last_modified, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY],
             callback
         );
     }
@@ -13,7 +13,6 @@ class File {
         db.query('DELETE FROM file WHERE name = ?', [name], callback);
     }
 
-    // Nuevo método para actualizar el nombre del archivo en la base de datos
     static updateName(oldFileName, newFileName, callback) {
         db.query(
             'UPDATE file SET name = ? WHERE name = ?',

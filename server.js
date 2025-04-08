@@ -1,76 +1,91 @@
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
 const routes = require('./routes/routes');
+const File = require('./models/fileModel'); // Importar modelo
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 app.use(express.json());
-
-// Configurar Multer para subir archivos a la carpeta 'uploads/'
-const upload = multer({ dest: 'uploads/' });
-
-// Ruta para manejar la subida de archivos
-app.post('/api/upload', upload.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No se recibió ningún archivo' });
-    }
-    res.json({ message: 'Archivo subido correctamente', file: req.file });
-});
-
-// Ruta para eliminar archivos en el servidor
-app.delete('/api/delete/:name', (req, res) => {
-    const fileName = req.params.name;
-    const filePath = path.join(__dirname, 'uploads', fileName);
-
-    fs.unlink(filePath, (err) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error al eliminar el archivo o no existe' });
-        }
-        res.json({ message: `Archivo ${fileName} eliminado` });
-    });
-});
-
-// Ruta para renombrar archivos
-app.put('/api/rename/:oldName', (req, res) => {
-    const oldName = req.params.oldName;
-    const newName = req.body.newName;
-
-    const oldFilePath = path.join(__dirname, 'uploads', oldName);
-    const newFilePath = path.join(__dirname, 'uploads', newName);
-
-    // Verificar si el archivo existe
-    fs.exists(oldFilePath, (exists) => {
-        if (!exists) {
-            return res.status(404).json({ error: 'Archivo no encontrado' });
-        }
-
-        // Renombrar archivo
-        fs.rename(oldFilePath, newFilePath, (err) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error al renombrar el archivo' });
-            }
-            res.json({ message: `Archivo renombrado de ${oldName} a ${newName}` });
-        });
-    });
-});
-
 app.use('/api', routes);
 
-// Manejo de WebSocket
+// WebSocket: conexiones en tiempo real
 wss.on('connection', ws => {
     console.log('Nuevo cliente conectado al servidor WebSocket');
-
     ws.send('Conectado al servidor de archivos');
 
     wss.clients.forEach(client => {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(' Nuevo usuario conectado al servidor');
+            client.send('Nuevo usuario conectado al servidor');
+        }
+    });
+
+    // Procesamiento de mensajes
+    ws.on('message', (message) => {
+        try {
+            const parsed = JSON.parse(message);
+
+            if (!parsed.action || !parsed.data) {
+                console.log('Mensaje no válido:', parsed);
+                ws.send('Formato de mensaje incorrecto');
+                return;
+            }
+
+            const { action, data } = parsed;
+
+            switch (action) {
+                case 'upload': {
+                    const { name, type, size, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY  } = data;
+                    const creation_date = new Date();
+                    const last_modified = creation_date;
+
+                    File.create({ name, type, size, creation_date, last_modified, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY  }, (err) => {
+                        if (err) {
+                            console.error('Error al guardar el archivo:', err);
+                            ws.send('Error al guardar el archivo');
+                        } else {
+                            console.log('Archivo guardado exitosamente');
+                            ws.send('Archivo registrado correctamente');
+                        }
+                    });
+                    break;
+                }
+                case 'delete': {
+                    const { name } = data;
+                    File.delete(name, (err) => {
+                        if (err) {
+                            console.error('Error al eliminar el archivo:', err);
+                            ws.send('Error al eliminar el archivo');
+                        } else {
+                            console.log(`Archivo "${name}" eliminado`);
+                            ws.send('Archivo eliminado correctamente');
+                        }
+                    });
+                    break;
+                }
+                case 'rename': {
+                    const { oldFileName, newFileName } = data;
+                    File.updateName(oldFileName, newFileName, (err) => {
+                        if (err) {
+                            console.error('Error al renombrar archivo:', err);
+                            ws.send('Error al renombrar archivo');
+                        } else {
+                            console.log(`Archivo renombrado de "${oldFileName}" a "${newFileName}"`);
+                            ws.send('Archivo renombrado correctamente');
+                        }
+                    });
+                    break;
+                }
+                default:
+                    console.log('Acción no reconocida:', action);
+                    ws.send('Acción no reconocida');
+            }
+
+        } catch (err) {
+            console.error('Error al procesar mensaje:', err);
+            ws.send('Error en el formato del mensaje');
         }
     });
 
@@ -83,5 +98,7 @@ wss.on('connection', ws => {
     });
 });
 
-// Iniciar el servidor
-server.listen(3000, () => console.log('Servidor en http://localhost:3000'));
+// Iniciar servidor
+server.listen(3000, () => {
+    console.log('Servidor corriendo en http://localhost:3000');
+});

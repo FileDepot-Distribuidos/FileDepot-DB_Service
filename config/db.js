@@ -4,7 +4,7 @@ const db = mysql.createConnection({
     host: '127.0.0.1',
     user: 'root',
     password: 'juanreyes8',
-    database: 'filedepot'
+    database: 'mydb'
 });
 
 db.connect(err => {
