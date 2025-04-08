@@ -1,120 +1,125 @@
-const axios = require('axios');
-const FormData = require('form-data');
 const fs = require('fs');
-const crypto = require('crypto');
-const readline = require('readline');
+const path = require('path');
 const WebSocket = require('ws');
+const readline = require('readline');
+const crypto = require('crypto');
 
-const SERVER_URL = 'http://localhost:3000/api';
-const WS_SERVER_URL = 'ws://localhost:3000';
+const ws = new WebSocket('ws://localhost:3000');
 
-// Establecer la conexión WebSocket
-const ws = new WebSocket(WS_SERVER_URL);
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 ws.on('open', () => {
     console.log('Conexión WebSocket establecida');
 });
 
-ws.on('message', message => {
-    console.log(`Mensaje del servidor: ${message}`);
+ws.on('message', (message) => {
+    console.log('Mensaje del servidor:', message.toString());
+    mostrarMenu();
 });
 
-// Función para generar el hash del archivo
-function generateFileHash(filePath) {
-    const fileBuffer = fs.readFileSync(filePath);
-    const hash = crypto.createHash('sha256');
-    hash.update(fileBuffer);
-    return hash.digest('hex');
-}
+function mostrarMenu() {
+    console.log("\nSelecciona una opción:");
+    console.log("1: Subir un archivo (solo metadatos)");
+    console.log("2: Eliminar un archivo");
+    console.log("3: Renombrar un archivo");
+    console.log("4: Salir");
 
-// Función para subir un archivo
-async function uploadFile(filePath) {
-    if (!fs.existsSync(filePath)) {
-        console.error(`Error: El archivo ${filePath} no existe`);
-        return;
-    }
-
-    try {
-        const fileHash = generateFileHash(filePath);  // Generar hash
-        const formData = new FormData();
-        formData.append('file', fs.createReadStream(filePath));
-        formData.append('hash', fileHash);  // Agregar hash al formulario
-
-        const response = await axios.post(`${SERVER_URL}/upload`, formData, {
-            headers: formData.getHeaders(),
-        });
-
-        console.log('Archivo subido con éxito:', response.data);
-    } catch (error) {
-        console.error('rror al subir el archivo:', error.response ? error.response.data : error.message);
-    }
-}
-
-// Función para eliminar un archivo
-async function deleteFile(nombreArchivo) {
-    try {
-        const response = await axios.delete(`${SERVER_URL}/delete/${nombreArchivo}`);
-        console.log('Archivo eliminado:', response.data);
-    } catch (error) {
-        console.error('Error al eliminar el archivo:', error.response ? error.response.data : error.message);
-    }
-}
-
-// Función para renombrar un archivo
-async function renameFile(oldName, newName) {
-    try {
-        const response = await axios.put(`${SERVER_URL}/rename/${oldName}`, { newName });
-        console.log('Archivo renombrado:', response.data);
-    } catch (error) {
-        console.error('Error al renombrar el archivo:', error.response ? error.response.data : error.message);
-    }
-}
-
-//menu
-function showMenu() {
-    console.log('Selecciona una opción:');
-    console.log('1: Subir un archivo');
-    console.log('2: Eliminar un archivo');
-    console.log('3: Renombrar un archivo');
-    console.log('4: Salir');
-}
-
-async function main() {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });
-
-    showMenu();
-
-    rl.question('Elige una opción: ', async (option) => {
-        if (option === '1') {
-            const filePath = await new Promise(resolve => {
-                rl.question('Ingresa la ruta del archivo a subir: ', resolve);
-            });
-            uploadFile(filePath);
-        } else if (option === '2') {
-            const fileName = await new Promise(resolve => {
-                rl.question('Ingresa el nombre del archivo a eliminar: ', resolve);
-            });
-            deleteFile(fileName);
-        } else if (option === '3') {
-            const oldName = await new Promise(resolve => {
-                rl.question('Ingresa el nombre del archivo a renombrar: ', resolve);
-            });
-            const newName = await new Promise(resolve => {
-                rl.question('Ingresa el nuevo nombre para el archivo: ', resolve);
-            });
-            renameFile(oldName, newName);
-        } else if (option === '4') {
-            console.log('Saliendo...');
-            rl.close();
-        } else {
-            console.log('Opción no válida');
-            rl.close();
+    rl.question("Elige una opción: ", (opcion) => {
+        switch (opcion) {
+            case '1':
+                subirArchivo();
+                break;
+            case '2':
+                eliminarArchivo();
+                break;
+            case '3':
+                renombrarArchivo();
+                break;
+            case '4':
+                rl.close();
+                ws.close();
+                break;
+            default:
+                console.log("Opción inválida");
+                mostrarMenu();
+                break;
         }
     });
 }
 
+function subirArchivo() {
+    rl.question("Ingresa la ruta del archivo a subir: ", (ruta) => {
+        fs.stat(ruta, (err, stats) => {
+            if (err) {
+                console.error("Error al leer el archivo:", err.message);
+                mostrarMenu();
+                return;
+            }
 
-main();
+            const nombre = path.basename(ruta);
+            const extension = path.extname(ruta).slice(1);
+            const tipo = getMimeType(extension);
+            const size = stats.size;
+
+            const contenido = fs.readFileSync(ruta);
+            const hash = crypto.createHash('sha256').update(contenido).digest('hex');
+
+            const owner_id = Math.floor(Math.random() * 1000); // ID aleatorio temporal
+            // const NODE_idNODE = Math.floor(Math.random() * 1000); // NODO aleatorio temporal
+            // const DIRECTORY_idDIRECTORY = Math.floor(Math.random() * 1000); // DIRECTORIO aleatorio temporal
+
+            const metadatos = {
+                action: 'upload',
+                data: {
+                    name: nombre,
+                    type: tipo,
+                    size,
+                    hash,
+                    owner_id,
+                    // NODE_idNODE,
+                    // DIRECTORY_idDIRECTORY
+                }
+            };
+
+            ws.send(JSON.stringify(metadatos));
+        });
+    });
+}
+
+function eliminarArchivo() {
+    rl.question("Ingresa el nombre del archivo a eliminar: ", (nombre) => {
+        const mensaje = {
+            action: 'delete',
+            data: { name: nombre }
+        };
+        ws.send(JSON.stringify(mensaje));
+    });
+}
+
+function renombrarArchivo() {
+    rl.question("Ingresa el nombre actual del archivo: ", (oldFileName) => {
+        rl.question("Ingresa el nuevo nombre del archivo: ", (newFileName) => {
+            const mensaje = {
+                action: 'rename',
+                data: { oldFileName, newFileName }
+            };
+            ws.send(JSON.stringify(mensaje));
+        });
+    });
+}
+
+function getMimeType(extension) {
+    const tipos = {
+        txt: 'text/plain',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        pdf: 'application/pdf',
+        doc: 'application/msword',
+        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    };
+    return tipos[extension.toLowerCase()] || 'application/octet-stream';
+}
