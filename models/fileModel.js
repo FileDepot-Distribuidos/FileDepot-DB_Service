@@ -20,6 +20,16 @@ class File {
             callback
         );
     }
+
+    static moveFile(id_file, new_dir_id, callback) {
+        db.query(
+            'UPDATE file SET DIRECTORY_idDIRECTORY = ? WHERE idFILE = ?',
+            [new_dir_id, id_file],
+            callback
+        );
+
+    }
+
 }
 
 module.exports = File;

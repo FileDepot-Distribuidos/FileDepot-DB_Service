@@ -2,7 +2,8 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const routes = require('./routes/routes');
-const File = require('./models/fileModel'); // Importar modelo
+const File = require('./models/fileModel');
+const Directory = require('./models/directoryModel');
 
 const app = express();
 const server = http.createServer(app);
