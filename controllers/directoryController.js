@@ -3,8 +3,6 @@ const Directory = require('../models/directoryModel');
 exports.createDirectory = (req, res) => {
     const { path, creation_date, owner_id, parent_directory_id } = req.body;
 
-    console.log("Datos recibidos para crear directorio:", req.body);
-
     Directory.create(path, creation_date, owner_id, parent_directory_id, (err, result) => {
         if (err) {
             console.error('Error al crear directorio:', err);

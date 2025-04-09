@@ -30,6 +30,4 @@ class Share {
 
 }
 
-
-
 module.exports = Share;
