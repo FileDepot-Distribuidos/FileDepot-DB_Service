@@ -13,3 +13,27 @@ exports.createDirectory = (req, res) => {
         res.status(201).json({ message: 'Directorio creado exitosamente', id: result.insertId });
     });
 };
+
+exports.getRootDirectory = (req, res) => {
+    const userId = req.params.userId;
+
+    Directory.getRootDirectoryByUser(userId, (err, results) => {
+        if (err) {
+            console.error('Error consultando directorio raíz:', err);
+            return res.status(500).json({ error: 'Error al consultar directorio' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'No se encontró directorio raíz para este usuario' });
+        }
+
+        res.json({ directoryId: results[0].idDIRECTORY });
+    });
+};
+
+exports.getAllDirectory = (req, res) => {
+    Directory.getAll((err, results) => {
+        if (err) return res.status(500).json({ error: 'Error al obtener directorios', details: err });
+        res.json(results);
+    });
+};

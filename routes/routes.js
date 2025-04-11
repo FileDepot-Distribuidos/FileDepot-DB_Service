@@ -5,25 +5,26 @@ const nodeController = require('../controllers/nodeController');
 const directoryController = require('../controllers/directoryController');
 const shareController = require('../controllers/shareController');
 
-// Ruta para manejar la subida de archivos
+// Files
 router.post('/upload', fileController.uploadFile);
-
-// Ruta para eliminar archivos en el servidor
+router.get('/files', fileController.getAllFiles);
 router.delete('/delete/:name', fileController.deleteFile);
-
 router.put('/move', fileController.moveFile);
-
-// Ruta para renombrar archivos
 router.put('/rename', fileController.renameFile);
 
+// Nodos
 router.post('/node', nodeController.registerNode);
 
+// Directorios
 router.post('/directory', directoryController.createDirectory);
+router.get('/directory/root/:userId', directoryController.getRootDirectory);
+router.get('/directory/obtener', directoryController.getAllDirectory);
 
+// Share
 router.post('/share', shareController.grantAccess);
 router.delete('/revoke', shareController.revokeAccess);
 router.get('/permissions/:file_id', shareController.getFilePermissions);
-router.get('/files', fileController.getAllFiles);
+
 
 
 module.exports = router;
