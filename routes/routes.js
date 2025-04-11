@@ -16,6 +16,9 @@ router.put('/rename', fileController.renameFile);
 router.post('/node', nodeController.registerNode);
 
 router.post('/directory', directoryController.createDirectory);
+router.get('/directory/root/:userId', directoryController.getRootDirectory);
+router.get('/directory/obtener', directoryController.getAllDirectory);
+
 
 
 module.exports = router;
