@@ -27,9 +27,11 @@ class File {
             [new_dir_id, id_file],
             callback
         );
-
     }
 
+    static getAll(callback) {
+        db.query('SELECT * FROM file', callback);
+    }
 }
 
 module.exports = File;

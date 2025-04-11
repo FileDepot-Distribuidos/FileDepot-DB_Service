@@ -68,8 +68,8 @@ function subirArchivo() {
             const hash = crypto.createHash('sha256').update(contenido).digest('hex');
 
             const owner_id = Math.floor(Math.random() * 1000); // ID aleatorio temporal
-            const NODE_idNODE = Math.floor(Math.random() * 3) + 1; // NODO aleatorio entre 1 y 3
-            const DIRECTORY_idDIRECTORY = Math.floor(Math.random() * 3) + 2; // DIRECTORIO aleatorio temporal
+            // const NODE_idNODE = Math.floor(Math.random() * 3) + 1; // NODO aleatorio entre 1 y 3
+            // const DIRECTORY_idDIRECTORY = Math.floor(Math.random() * 3) + 2; // DIRECTORIO aleatorio temporal
 
             const metadatos = {
                 action: 'upload',
@@ -79,8 +79,8 @@ function subirArchivo() {
                     size,
                     hash,
                     owner_id,
-                    NODE_idNODE,
-                    DIRECTORY_idDIRECTORY
+                    // NODE_idNODE,
+                    // DIRECTORY_idDIRECTORY
                 }
             };
 

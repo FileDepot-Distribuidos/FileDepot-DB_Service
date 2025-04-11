@@ -23,6 +23,7 @@ router.post('/directory', directoryController.createDirectory);
 router.post('/share', shareController.grantAccess);
 router.delete('/revoke', shareController.revokeAccess);
 router.get('/permissions/:file_id', shareController.getFilePermissions);
+router.get('/files', fileController.getAllFiles);
 
 
 module.exports = router;
