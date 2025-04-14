@@ -29,8 +29,8 @@ class File {
         );
     }
 
-    static getAll(callback) {
-        db.query('SELECT * FROM file', callback);
+    static getAll(owner_id, callback) {
+        db.query('SELECT * FROM file WHERE owner_id = ?', [owner_id], callback);
     }
 }
 

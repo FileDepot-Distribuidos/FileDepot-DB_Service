@@ -83,9 +83,11 @@ exports.moveFile = (req, res) => {
     });
 };
 
-// Obtener todos los archivos
+// Obtener todos los archivos del propietario
 exports.getAllFiles = (req, res) => {
-    File.getAll((err, files) => {
+    const owner_id = req.userID; // Assuming the JWT middleware sets `req.user`
+
+    File.getAll(owner_id, (err, files) => {
         if (err) {
             return res.status(500).json({ error: 'Error al obtener los archivos', details: err });
         }

@@ -100,6 +100,6 @@ wss.on('connection', ws => {
 });
 
 // Iniciar servidor
-server.listen(3000, () => {
-    console.log('Servidor corriendo en http://localhost:3000');
+server.listen(3001, () => {
+    console.log('Servidor corriendo en http://localhost:3001');
 });
