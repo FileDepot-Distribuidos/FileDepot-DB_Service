@@ -4,7 +4,7 @@ const WebSocket = require('ws');
 const readline = require('readline');
 const crypto = require('crypto');
 
-const ws = new WebSocket('ws://localhost:3000/upload');
+const ws = new WebSocket('ws://localhost:3001/upload');
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -69,7 +69,10 @@ function subirArchivo() {
 
             const owner_id = Math.floor(Math.random() * 1000); // ID aleatorio temporal
             // const NODE_idNODE = Math.floor(Math.random() * 3) + 1; // NODO aleatorio entre 1 y 3
+            const NODE_idNODE = 1;
             // const DIRECTORY_idDIRECTORY = Math.floor(Math.random() * 3) + 2; // DIRECTORIO aleatorio temporal
+            const DIRECTORY_idDIRECTORY = 2;
+
 
             const metadatos = {
                 action: 'upload',
@@ -79,8 +82,8 @@ function subirArchivo() {
                     size,
                     hash,
                     owner_id,
-                    // NODE_idNODE,
-                    // DIRECTORY_idDIRECTORY
+                    NODE_idNODE,
+                    DIRECTORY_idDIRECTORY
                 }
             };
 

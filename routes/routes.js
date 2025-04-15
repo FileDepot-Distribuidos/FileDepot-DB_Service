@@ -7,7 +7,7 @@ const shareController = require('../controllers/shareController');
 
 // Files
 router.post('/upload', fileController.uploadFile);
-router.get('/files', fileController.getAllFiles);
+router.get('/files/:userId', fileController.getAllFiles);
 router.delete('/delete/:name', fileController.deleteFile);
 router.put('/move', fileController.moveFile);
 router.put('/rename', fileController.renameFile);

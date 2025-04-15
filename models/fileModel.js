@@ -30,7 +30,9 @@ class File {
     }
 
     static getAll(owner_id, callback) {
-        db.query('SELECT * FROM file WHERE owner_id = ?', [owner_id], callback);
+        db.query('SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE owner_id = ?',
+            [owner_id],
+            callback);
     }
 }
 
