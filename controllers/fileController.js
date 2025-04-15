@@ -37,18 +37,19 @@ exports.uploadFile = (req, res) => {
 
 // Eliminar archivo por nombre
 exports.deleteFile = (req, res) => {
-    const { name } = req.params;
+    const { id } = req.params; // Ahora esperamos un parámetro "id" en la URL
 
-    File.delete(name, (err) => {
+    File.delete(id, (err) => {
         if (err) {
             console.error('Error en DB:', err);
             return res.status(500).send(err);
         }
 
-        console.log('Archivo eliminado de la base de datos:', name);
-        res.send('Archivo eliminado');
+        console.log('Archivo eliminado de la base de datos:', id);
+        res.send(`Archivo con id ${id} eliminado`);
     });
 };
+
 
 // Renombrar archivo
 exports.renameFile = (req, res) => {

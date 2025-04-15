@@ -9,9 +9,10 @@ class File {
         );
     }
 
-    static delete(name, callback) {
-        db.query('DELETE FROM file WHERE name = ?', [name], callback);
+    static delete(id, callback) {
+        db.query('DELETE FROM file WHERE idFILE = ?', [id], callback);
     }
+    
 
     static updateName(oldFileName, newFileName, callback) {
         db.query(
