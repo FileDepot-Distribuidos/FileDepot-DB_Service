@@ -22,6 +22,27 @@ class File {
         );
     }
 
+    static getById(id, callback) {
+        console.log("Buscando archivo en modelo con ID:", id);
+
+        const query = 'SELECT * FROM file WHERE idFILE = ?';
+
+        db.query(query, [id], (err, results) => {
+            if (err) {
+                console.error('Error al consultar archivo en modelo con ID', id, ':', err);
+                return callback(err, null);
+            }
+
+            if (results.length === 0) {
+                console.warn(`No se encontró ningún archivo con ID: ${id}`);
+                return callback(null, null);
+            }
+
+            console.log("Archivo encontrado en modelo:", results[0]);
+            callback(null, results[0]);
+        });
+    }
+
     static moveFile(id_file, new_dir_id, callback) {
         db.query(
             'UPDATE file SET DIRECTORY_idDIRECTORY = ? WHERE idFILE = ?',

@@ -8,9 +8,10 @@ const shareController = require('../controllers/shareController');
 // Files
 router.post('/upload', fileController.uploadFile);
 router.get('/files/:userId', fileController.getAllFiles);
-router.delete('/delete/:name', fileController.deleteFile);
+router.delete('/delete/:id', fileController.deleteFile);
 router.put('/move', fileController.moveFile);
 router.put('/rename', fileController.renameFile);
+router.get('/files/byId/:id', fileController.getFileById);
 
 // Nodos
 router.post('/node', nodeController.registerNode);

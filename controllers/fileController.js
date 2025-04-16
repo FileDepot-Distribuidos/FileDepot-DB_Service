@@ -23,30 +23,53 @@ exports.uploadFile = (req, res) => {
 
     File.create(
         { name, type, size, creation_date, last_modified, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY },
-        (err) => {
+        (err, result) => {
             if (err) {
                 console.error('Error al registrar el archivo en la base de datos:', err);
                 return res.status(500).send(err);
             }
 
-            console.log('Archivo registrado correctamente en la base de datos');
-            res.send('Archivo registrado correctamente');
+            const insertedId = result.insertId;
+            console.log('Archivo registrado con ID:', insertedId);
+            res.status(201).json({
+                message: 'Archivo registrado correctamente',
+                id: insertedId
+            });
         }
     );
 };
 
-// Eliminar archivo por nombre
+
+// Eliminar archivo por ID
 exports.deleteFile = (req, res) => {
-    const { id } = req.params; // Ahora esperamos un parámetro "id" en la URL
+    const { id } = req.params;
+    console.log("ID recibido para eliminar:", req.params.id);
+
 
     File.delete(id, (err) => {
         if (err) {
-            console.error('Error en DB:', err);
+            console.error('Error al eliminar archivo en la base de datos:', err);
             return res.status(500).send(err);
         }
 
-        console.log('Archivo eliminado de la base de datos:', id);
-        res.send(`Archivo con id ${id} eliminado`);
+        console.log('Archivo eliminado de la base de datos, ID:', id);
+        res.send(`Archivo con ID ${id} eliminado correctamente`);
+    });
+};
+
+exports.getFileById = (req, res) => {
+    const { id } = req.params;
+    
+    File.getById(id, (err, file) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error al consultar archivo' });
+        }
+
+        if (!file) {
+            return res.status(404).json({ message: 'Archivo no encontrado' });
+        }
+
+        res.json(file);
     });
 };
 
