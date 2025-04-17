@@ -20,6 +20,12 @@ router.post('/node', nodeController.registerNode);
 router.post('/directory', directoryController.createDirectory);
 router.get('/directory/root/:userId', directoryController.getRootDirectory);
 router.get('/directory/obtener', directoryController.getAllDirectory);
+router.put('/directory/rename', directoryController.renameDirectory);
+router.put('/directory/move', directoryController.moveDirectory);
+router.delete('/directory/delete/:id', directoryController.deleteDirectory);
+router.get('/directory/by-id/:id', directoryController.getDirectoryById);
+router.get('/directory/by-path/:path', directoryController.getDirectoryByPath);
+
 
 // Share
 router.post('/share', shareController.grantAccess);

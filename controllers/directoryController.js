@@ -37,3 +37,86 @@ exports.getAllDirectory = (req, res) => {
         res.json(results);
     });
 };
+
+exports.renameDirectory = (req, res) => {
+    const { id, newPath } = req.body;
+
+    // 1. Obtener el path actual
+    Directory.getById(id, (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(500).json({ error: 'No se pudo obtener el path del directorio original' });
+        }
+
+        const oldPath = results[0].path;
+
+        // 2. Renombrar el directorio principal
+        Directory.rename(id, newPath, (err) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error al renombrar directorio principal' });
+            }
+
+            // 3. Actualizar todos los hijos (paths descendientes)
+            Directory.updatePathsRecursively(oldPath, newPath, (err2) => {
+                if (err2) {
+                    return res.status(500).json({ error: 'Error actualizando paths de subdirectorios' });
+                }
+
+                res.json({ message: 'Directorio y subdirectorios renombrados correctamente' });
+            });
+        });
+    });
+};
+
+exports.moveDirectory = (req, res) => {
+    const { id, newParentId, newFullPath } = req.body;
+
+    Directory.move(id, newParentId, newFullPath, (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error al mover directorio', details: err });
+        res.json({ message: 'Directorio movido correctamente' });
+    });
+};
+
+exports.getDirectoryById = (req, res) => {
+    const id = req.params.id;
+
+    Directory.getById(id, (err, results) => {
+        if (err) {
+            console.error('Error consultando directorio por ID:', err);
+            return res.status(500).json({ error: 'Error al consultar directorio' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Directorio no encontrado' });
+        }
+
+        res.json(results[0]);
+    });
+};
+
+exports.getDirectoryByPath = (req, res) => {
+    let path = decodeURIComponent(req.params.path); // 🔧 necesario
+    if (path.endsWith('/')) {
+        path = path.slice(0, -1);
+    }
+
+    Directory.getByPath(path, (err, results) => {
+        if (err) return res.status(500).json({ error: 'Error al buscar por path' });
+        if (results.length === 0) return res.status(404).json({ error: 'Directorio no encontrado' });
+        res.json({ directoryId: results[0].idDIRECTORY });
+    });
+};
+
+
+exports.deleteDirectory = (req, res) => {
+    const id = req.params.id;
+
+    Directory.deleteDirectoryRecursive(id, (err) => {
+        if (err) {
+            console.error("Error en eliminación recursiva:", err);
+            return res.status(500).json({ error: 'Error al eliminar directorio de forma recursiva' });
+        }
+        res.json({ message: 'Directorio y contenido eliminado correctamente' });
+    });
+};
+
+
