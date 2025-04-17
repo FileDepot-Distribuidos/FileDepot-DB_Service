@@ -34,6 +34,28 @@ class File {
             [owner_id],
             callback);
     }
+
+  static getFileLocationById(fileID, callback) {
+    const query = `
+        SELECT 
+            f.idFILE AS file_id,
+            f.name AS file_name,
+            d.path AS directory_path,
+            n.idNODE AS node_id,
+            n.ipv4_address AS node_ip
+        FROM 
+            FILE f
+        JOIN 
+            DIRECTORY d ON f.DIRECTORY_idDIRECTORY = d.idDIRECTORY
+        JOIN 
+            NODE n ON f.NODE_idNODE = n.idNODE
+        WHERE 
+            f.idFILE = ?
+    `;
+
+    db.query(query, [fileID], callback);
+}
+
 }
 
 module.exports = File;

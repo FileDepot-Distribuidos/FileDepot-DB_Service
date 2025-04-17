@@ -11,7 +11,7 @@ router.get('/files/:userId', fileController.getAllFiles);
 router.delete('/delete/:name', fileController.deleteFile);
 router.put('/move', fileController.moveFile);
 router.put('/rename', fileController.renameFile);
-
+router.get('/download/:fileId', fileController.downloadFile);
 // Nodos
 router.post('/node', nodeController.registerNode);
 
