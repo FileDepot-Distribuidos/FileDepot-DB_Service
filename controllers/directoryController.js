@@ -32,7 +32,33 @@ exports.getRootDirectory = (req, res) => {
 };
 
 exports.getAllDirectory = (req, res) => {
-    Directory.getAll((err, results) => {
+    const userId = req.params.userId;
+    Directory.getAll( userId, (err, results) => {
+        if (err) return res.status(500).json({ error: 'Error al obtener directorios', details: err });
+        res.json(results);
+    });
+};
+
+exports.getByDirectory = (req, res) => {
+    const owner_id = req.params.userId;
+    const dir = req.params.dir;
+
+    if (dir === '0') {
+        return Directory.getRootDirectoryByUser(owner_id, (err, rootDir) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error al obtener el directorio raíz', details: err });
+            }
+            const newDir = rootDir[0].idDIRECTORY;
+            Directory.getByDir(owner_id, newDir, (err, files) => {
+                if (err) {
+                    return res.status(500).json({ error: 'Error al obtener los directorios', details: err });
+                }
+                res.json(files);
+            });
+        });
+    }
+
+    Directory.getByDir( owner_id, dir, (err, results) => {
         if (err) return res.status(500).json({ error: 'Error al obtener directorios', details: err });
         res.json(results);
     });

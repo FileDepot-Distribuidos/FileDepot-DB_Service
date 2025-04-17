@@ -1,5 +1,6 @@
 const { log } = require('console');
 const File = require('../models/fileModel');
+const Directory = require('../models/directoryModel');
 
 // Crear archivo
 exports.uploadFile = (req, res) => {
@@ -111,6 +112,33 @@ exports.getAllFiles = (req, res) => {
     const owner_id = parseInt(req.params.userId);
 
     File.getAll(owner_id, (err, files) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error al obtener los archivos', details: err });
+        }
+        res.json(files);
+    });
+};
+
+exports.getFiles = (req, res) => {
+    const owner_id = parseInt(req.params.userId);
+    const dir = req.params.dir;
+
+    if (dir === '0') {
+        return Directory.getRootDirectoryByUser(owner_id, (err, rootDir) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error al obtener el directorio raíz', details: err });
+            }
+            const newDir = rootDir[0].idDIRECTORY;
+            File.getFiles(owner_id, newDir, (err, files) => {
+                if (err) {
+                    return res.status(500).json({ error: 'Error al obtener los archivos', details: err });
+                }
+                res.json(files);
+            });
+        });
+    }
+
+    File.getFiles(owner_id, dir, (err, files) => {
         if (err) {
             return res.status(500).json({ error: 'Error al obtener los archivos', details: err });
         }

@@ -56,6 +56,13 @@ class File {
             [owner_id],
             callback);
     }
+
+    static getFiles(owner_id, DIRECTORY_idDIRECTORY, callback) {
+        db.query('SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?',
+            [owner_id, DIRECTORY_idDIRECTORY],
+            callback);
+    }
+
 }
 
 module.exports = File;

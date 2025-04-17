@@ -20,9 +20,20 @@ class Directory {
         db.query(query, [userId], callback);
     }
 
-    static getAll(callback) {
-        db.query('SELECT * FROM directory', callback); 
+    static getAll(owner_id, callback) {
+        const query = `
+            SELECT * FROM directory WHERE owner_id = ?
+        `;
+        db.query(query, [owner_id], callback);
     }
+
+    static getByDir(owner_id, DIRECTORY_idDIRECTORY, callback) {
+        const query = `
+            SELECT * FROM directory WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?
+        `;
+        db.query(query, [owner_id, DIRECTORY_idDIRECTORY], callback);
+    }
+
 
     static rename(id, newPath, callback) {
         const query = `
@@ -63,7 +74,7 @@ class Directory {
 
     static getSubdirectories(parentId, callback) {
         const query = `
-            SELECT idDIRECTORY FROM directory WHERE DIRECTORY_idDIRECTORY = ?
+            SELECT * FROM directory WHERE DIRECTORY_idDIRECTORY = ?
         `;
         db.query(query, [parentId], callback);
     }
