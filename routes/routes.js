@@ -12,7 +12,7 @@ router.get('/files/:userId/:dir', fileController.getFiles);
 router.delete('/delete/:id', fileController.deleteFile);
 router.put('/move', fileController.moveFile);
 router.put('/rename', fileController.renameFile);
-router.get('/files/byId/:id', fileController.getFileById);
+router.get('/file/byId/:id', fileController.getFileById);
 
 // Nodos
 router.post('/node', nodeController.registerNode);
@@ -30,7 +30,9 @@ router.get('/directory/by-path/:path', directoryController.getDirectoryByPath);
 
 
 // Share
-router.post('/share', shareController.grantAccess);
+router.post('/shareFile', shareController.grantAccess);
+router.post('/shareDirectory', shareController.grantAccessDir);
+router.get('/shared/:id', shareController.getSharedFiles);
 router.delete('/revoke', shareController.revokeAccess);
 router.get('/permissions/:file_id', shareController.getFilePermissions);
 

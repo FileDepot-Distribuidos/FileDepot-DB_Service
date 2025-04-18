@@ -2,18 +2,51 @@ const Share = require('../models/shareModel');
 
 // Otorgar acceso a un archivo
 exports.grantAccess = (req, res) => {
-    const { user_id, type, file_id } = req.body;
-    console.log("Datos para otorgar acceso:", req.body);
 
-    if (!user_id || !type || !file_id) {
+    const { sharedWithId, sharedFile } = req.body;
+
+    if (!sharedWithId || !sharedFile) {
         return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
 
-    Share.grantAccess({ user_id, type, file_id }, (err) => {
+    Share.grantAccess(sharedWithId, sharedFile, (err) => {
         if (err) return res.status(500).send(err);
-        res.send('Acceso otorgado correctamente');
+        res.status(200).send('Acceso otorgado correctamente');
     });
 };
+
+// Otorgar acceso a una carpeta (varios archivos)
+exports.grantAccessDir = (req, res) => {
+
+    const { sharedWithId, sharedDirectory } = req.body;
+
+    if (!sharedWithId || !sharedDirectory) {
+        return res.status(400).json({ error: 'Faltan campos requeridos' });
+    }
+
+    Share.grantAccessDir(sharedWithId, sharedDirectory, (err) => {
+        if (err) return res.status(500).send(err);
+        res.status(200).send('Acceso otorgado correctamente');
+    });
+};
+
+// Obtiene todos los archivos compartidos de un usuario
+exports.getSharedFiles = (req, res) => {
+
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ error: 'No se recibio el ID del usuario' });
+    }
+
+    Share.getFiles(id, (err, files) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error al obtener los archivos compartidos', details: err });
+        }
+        res.json(files);
+    });
+};
+
 
 // Revocar acceso a un archivo
 exports.revokeAccess = (req, res) => {

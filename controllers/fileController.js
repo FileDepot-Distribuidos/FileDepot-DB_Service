@@ -60,6 +60,7 @@ exports.deleteFile = (req, res) => {
 
 exports.getFileById = (req, res) => {
     const { id } = req.params;
+
     
     File.getById(id, (err, file) => {
         if (err) {
