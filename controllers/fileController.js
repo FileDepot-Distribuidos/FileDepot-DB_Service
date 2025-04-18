@@ -146,3 +146,41 @@ exports.getFiles = (req, res) => {
         res.json(files);
     });
 };
+
+//Descargar archivo por ID
+exports.downloadFile = (req, res) => {
+    const fileID = parseInt(req.params.fileId);
+
+
+    File.getFileLocationById(fileID, (err, results) => {
+        if (err) {
+            console.error(' Error en la base de datos:', err);
+            return res.status(500).json({ success: false, message: 'Error interno del servidor', error: err });
+        }
+    
+        if (!results || results.length === 0) {
+            console.warn(' Archivo no encontrado para ID:', fileID);
+            return res.status(404).json({ success: false, message: 'Archivo no encontrado' });
+        }
+    
+        const file = results[0];
+    
+        // Mostrar en consola
+        console.log(' Resultado de la consulta:', file);
+    
+        // Devolver la respuesta, pero falta concatenar el nombre del archivo al directorio
+        res.json({
+            success: true,
+            fileID: file.file_id,
+            fileName: file.file_name,
+            nodeID: file.node_id,
+            nodeIP: file.node_ip,
+            filePath: file.directory_path + "/" + file.file_name,  
+        });
+        console.log(' Respuesta enviada al cliente:', {
+            filePath: file.directory_path  + file.file_name,  
+        });
+    });
+    
+};
+

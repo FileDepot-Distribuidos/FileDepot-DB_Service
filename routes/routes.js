@@ -13,6 +13,7 @@ router.delete('/delete/:id', fileController.deleteFile);
 router.put('/move', fileController.moveFile);
 router.put('/rename', fileController.renameFile);
 router.get('/file/byId/:id', fileController.getFileById);
+router.get('/download/:fileId', fileController.downloadFile);
 
 // Nodos
 router.post('/node', nodeController.registerNode);
