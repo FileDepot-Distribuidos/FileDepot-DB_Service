@@ -1,9 +1,42 @@
 const Directory = require('../models/directoryModel');
 
 exports.createDirectory = (req, res) => {
-    const { path, creation_date, owner_id, parent_directory_id } = req.body;
+    let { path, creation_date, owner_id, parentDirectory, isRoot } = req.body;
 
-    console.log("Datos recibidos para crear directorio:", req.body);
+    console.log("Datos recibidos en createDirectory:");
+    console.log({ path, creation_date, owner_id, parentDirectory, isRoot });
+
+    // 🔧 Si NO se envió parentDirectory, y no es raíz, intentar inferirlo desde el path
+    if (!parentDirectory && !isRoot) {
+        const cleanPath = path.endsWith('/') ? path.slice(0, -1) : path;
+        const lastSlash = cleanPath.lastIndexOf('/');
+
+        if (lastSlash !== -1) {
+            const inferredParentPath = cleanPath.slice(0, lastSlash);
+
+            Directory.getByPath(inferredParentPath, (err, results) => {
+                if (err || results.length === 0) {
+                    console.error("❌ Error obteniendo directorio padre:", err || "no encontrado");
+                    return res.status(500).json({ error: "No se pudo encontrar directorio padre" });
+                }
+
+                const parent_directory_id = results[0].idDIRECTORY;
+
+                Directory.create(path, creation_date, owner_id, parent_directory_id, (err, result) => {
+                    if (err) {
+                        console.error('Error al crear directorio:', err);
+                        return res.status(500).json({ error: 'Error al crear directorio' });
+                    }
+                    res.status(201).json({ message: 'Directorio creado exitosamente', id: result.insertId });
+                });
+            });
+
+            return; // Salir temprano mientras se resuelve la inferencia
+        }
+    }
+
+    // ✅ Si sí viene parentDirectory (aunque sea raíz), úsalo directamente
+    const parent_directory_id = parentDirectory ?? null;
 
     Directory.create(path, creation_date, owner_id, parent_directory_id, (err, result) => {
         if (err) {
@@ -103,15 +136,21 @@ exports.moveDirectory = (req, res) => {
 };
 
 exports.getDirectoryById = (req, res) => {
-    const id = req.params.id;
+    const id = Number(req.params.id?.trim());
+
+    if (isNaN(id)) {
+        console.error("❌ ID inválido recibido:", req.params.id);
+        return res.status(400).json({ error: "ID inválido" });
+    }
 
     Directory.getById(id, (err, results) => {
         if (err) {
-            console.error('Error consultando directorio por ID:', err);
+            console.error('❌ Error consultando directorio por ID:', err);
             return res.status(500).json({ error: 'Error al consultar directorio' });
         }
 
-        if (results.length === 0) {
+        if (!results || results.length === 0) {
+            console.warn("⚠️ No se encontró directorio con ID:", id);
             return res.status(404).json({ error: 'Directorio no encontrado' });
         }
 
@@ -120,9 +159,9 @@ exports.getDirectoryById = (req, res) => {
 };
 
 exports.getDirectoryByPath = (req, res) => {
-    let path = decodeURIComponent(req.params.path); // 🔧 necesario
-    if (path.endsWith('/')) {
-        path = path.slice(0, -1);
+    let path = decodeURIComponent(req.params.path); 
+    if (!path.endsWith('/')) {
+        path += '/';
     }
 
     Directory.getByPath(path, (err, results) => {

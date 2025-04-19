@@ -5,6 +5,7 @@ const nodeController = require('../controllers/nodeController');
 const directoryController = require('../controllers/directoryController');
 const shareController = require('../controllers/shareController');
 
+
 // Files
 router.post('/upload', fileController.uploadFile);
 router.get('/files/:userId', fileController.getAllFiles);
@@ -26,8 +27,8 @@ router.get('/directory/:userId/:dir', directoryController.getByDirectory);
 router.put('/directory/rename', directoryController.renameDirectory);
 router.put('/directory/move', directoryController.moveDirectory);
 router.delete('/directory/delete/:id', directoryController.deleteDirectory);
-router.get('/directory/by-id/:id', directoryController.getDirectoryById);
-router.get('/directory/by-path/:path', directoryController.getDirectoryByPath);
+router.get('/directorio/id/:id', directoryController.getDirectoryById);
+router.get('/directorio/path/:path', directoryController.getDirectoryByPath);
 
 
 // Share

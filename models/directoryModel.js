@@ -58,11 +58,13 @@ class Directory {
     }
 
     static getById(id, callback) {
-        const query = `
-            SELECT * FROM directory WHERE idDIRECTORY = ?
-        `;
-        db.query(query, [id], callback);
+        const query = `SELECT * FROM directory WHERE idDIRECTORY = ?`;
+        db.query(query, [id], (err, results) => {
+            console.log("🧪 Resultado crudo del query:", results);
+            callback(err, results);
+        });
     }
+    
 
     // Para eliminar lo que hay dentro de la carpeta
     static getFilesInDirectory(directoryId, callback) {
@@ -85,8 +87,12 @@ class Directory {
         `;
         db.query(query, [id], callback);
     }
-    
+
     static getByPath(path, callback) {
+        if (!path.endsWith('/')) {
+            path += '/';
+        }
+    
         const query = `SELECT idDIRECTORY FROM directory WHERE path = ?`;
         db.query(query, [path], callback);
     }
