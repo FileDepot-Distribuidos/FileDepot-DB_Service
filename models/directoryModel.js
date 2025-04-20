@@ -66,7 +66,6 @@ class Directory {
     }
     
 
-    // Para eliminar lo que hay dentro de la carpeta
     static getFilesInDirectory(directoryId, callback) {
         const query = `
             SELECT idFILE FROM file WHERE DIRECTORY_idDIRECTORY = ?
@@ -115,19 +114,14 @@ class Directory {
     }
 
 
-    // Borrado recursivo completo
     static deleteDirectoryRecursive(id, callback) {
         this.getSubdirectories(id, (err, subdirs) => {
             if (err) return callback(err);
 
-            // Primero eliminar subdirectorios 
             const deleteNext = (index) => {
                 if (index >= subdirs.length) {
-                    // Luego borrar archivos 
                     this.deleteFilesByDirectoryId(id, (err) => {
                         if (err) return callback(err);
-
-                        // Borrar el propio directorio
                         this.deleteDirectoryById(id, callback);
                     });
                     return;
