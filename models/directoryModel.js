@@ -47,8 +47,16 @@ class Directory {
             UPDATE directory SET DIRECTORY_idDIRECTORY = ?, path = ?
             WHERE idDIRECTORY = ?
         `;
-        db.query(query, [newParentId, newFullPath, id], callback);
+        db.query(query, [newParentId, newFullPath, id], (err, result) => {
+            console.log("📤 UPDATE ejecutado con valores:");
+            console.log("→ newParentId:", newParentId);
+            console.log("→ newFullPath:", newFullPath);
+            console.log("→ id:", id);
+            console.log("🧾 Resultado:", result);
+            callback(err, result);
+        });
     }
+    
 
     static deleteOnlyDirectory(id, callback) {
         const query = `
@@ -88,10 +96,6 @@ class Directory {
     }
 
     static getByPath(path, callback) {
-        if (!path.endsWith('/')) {
-            path += '/';
-        }
-    
         const query = `SELECT idDIRECTORY FROM directory WHERE path = ?`;
         db.query(query, [path], callback);
     }
