@@ -24,21 +24,26 @@ class File {
 
     static getById(id, callback) {
         console.log("Buscando archivo en modelo con ID:", id);
-
-        const query = 'SELECT * FROM file WHERE idFILE = ?';
-
+    
+        const query = `
+            SELECT f.*, d.path AS directory_path
+            FROM file f
+            JOIN directory d ON f.DIRECTORY_idDIRECTORY = d.idDIRECTORY
+            WHERE f.idFILE = ?
+        `;
+    
         db.query(query, [id], (err, results) => {
             if (err) {
                 console.error('Error al consultar archivo en modelo con ID', id, ':', err);
                 return callback(err, null);
             }
-
+    
             if (results.length === 0) {
                 console.warn(`No se encontró ningún archivo con ID: ${id}`);
                 return callback(null, null);
             }
-
-            console.log("Archivo encontrado en modelo:", results[0]);
+    
+            console.log("Archivo encontrado en modelo con path:", results[0]);
             callback(null, results[0]);
         });
     }

@@ -47,8 +47,16 @@ class Directory {
             UPDATE directory SET DIRECTORY_idDIRECTORY = ?, path = ?
             WHERE idDIRECTORY = ?
         `;
-        db.query(query, [newParentId, newFullPath, id], callback);
+        db.query(query, [newParentId, newFullPath, id], (err, result) => {
+            console.log("📤 UPDATE ejecutado con valores:");
+            console.log("→ newParentId:", newParentId);
+            console.log("→ newFullPath:", newFullPath);
+            console.log("→ id:", id);
+            console.log("🧾 Resultado:", result);
+            callback(err, result);
+        });
     }
+    
 
     static deleteOnlyDirectory(id, callback) {
         const query = `
@@ -66,7 +74,6 @@ class Directory {
     }
     
 
-    // Para eliminar lo que hay dentro de la carpeta
     static getFilesInDirectory(directoryId, callback) {
         const query = `
             SELECT idFILE FROM file WHERE DIRECTORY_idDIRECTORY = ?
@@ -89,10 +96,6 @@ class Directory {
     }
 
     static getByPath(path, callback) {
-        if (!path.endsWith('/')) {
-            path += '/';
-        }
-    
         const query = `SELECT idDIRECTORY FROM directory WHERE path = ?`;
         db.query(query, [path], callback);
     }
@@ -115,19 +118,14 @@ class Directory {
     }
 
 
-    // Borrado recursivo completo
     static deleteDirectoryRecursive(id, callback) {
         this.getSubdirectories(id, (err, subdirs) => {
             if (err) return callback(err);
 
-            // Primero eliminar subdirectorios 
             const deleteNext = (index) => {
                 if (index >= subdirs.length) {
-                    // Luego borrar archivos 
                     this.deleteFilesByDirectoryId(id, (err) => {
                         if (err) return callback(err);
-
-                        // Borrar el propio directorio
                         this.deleteDirectoryById(id, callback);
                     });
                     return;
