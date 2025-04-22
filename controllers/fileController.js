@@ -178,7 +178,7 @@ exports.downloadFile = (req, res) => {
             filePath: file.directory_path + "/" + file.file_name,  
         });
         console.log(' Respuesta enviada al cliente:', {
-            filePath: file.directory_path  + file.file_name,  
+            filePath: file.directory_path  + "->" + file.file_name,  
         });
     });
     
