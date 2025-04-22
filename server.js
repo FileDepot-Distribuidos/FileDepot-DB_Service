@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
@@ -99,7 +100,9 @@ wss.on('connection', ws => {
     });
 });
 
-// Iniciar servidor
-server.listen(3001, () => {
-    console.log('Servidor corriendo en http://localhost:3001');
+
+const IP = process.env.SERVER_IP || 'localhost';
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://${IP}:${PORT}`);
 });
