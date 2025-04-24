@@ -61,6 +61,9 @@ exports.deleteFile = (req, res) => {
 exports.getFileById = (req, res) => {
     const { id } = req.params;
 
+    console.log("ID recibido para consultar archivo:", id);
+    
+
     
     File.getById(id, (err, file) => {
         if (err) {
@@ -91,21 +94,17 @@ exports.renameFile = (req, res) => {
 
 // Mover archivo a otro directorio
 exports.moveFile = (req, res) => {
-    const { file_id, new_dir_id } = req.body;
+    const { fileID, newDirectoryId } = req.body;
 
-    File.moveFile(file_id, new_dir_id, (err, result) => {
+    File.moveFile(fileID, newDirectoryId, (err, result) => {
         if (err) return res.status(500).json({ error: 'Error al mover el archivo', details: err });
     
         if (result.affectedRows === 0 || result.changedRows === 0) {
             return res.status(404).json({ 
-                message: `No se encontró el archivo #'${file_id}' o ya estaba en ese directorio.` 
+                message: `No se encontró el archivo #'${fileID}' o ya estaba en ese directorio.` 
             });
         }
-    
-        res.json({ 
-            message: `Archivo #'${file_id}' movido correctamente al directorio #${new_dir_id}.`,
-            result
-        });
+        res.json({ message: 'Archivo movido correctamente', fileID, newDirectoryId });
     });
 };
 
