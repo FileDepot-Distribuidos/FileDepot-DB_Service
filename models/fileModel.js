@@ -10,7 +10,15 @@ class File {
     }
 
     static delete(id, callback) {
-        db.query('DELETE FROM file WHERE idFILE = ?', [id], callback);
+
+        db.query('DELETE FROM permission WHERE FILE_idFILE = ?', [id], (err) => {
+            if (err) {
+                return callback(err);
+            }
+            
+            db.query('DELETE FROM file WHERE idFILE = ?', [id], callback);
+        });
+
     }
     
 
