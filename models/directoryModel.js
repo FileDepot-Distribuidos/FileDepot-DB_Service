@@ -145,6 +145,17 @@ class Directory {
 
 
     static deleteDirectoryRecursive(id, callback) {
+
+        const query = `
+            DELETE FROM permission WHERE DIRECTORY_idDIRECTORY = ?
+        `;
+
+        db.query(query, [id], (err) => {
+            if (err) {
+                return callback(err);
+            }
+        });
+        
         this.getSubdirectories(id, (err, subdirs) => {
             if (err) return callback(err);
 
