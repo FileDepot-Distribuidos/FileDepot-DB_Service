@@ -71,9 +71,35 @@ class File {
     }
 
     static getFiles(owner_id, DIRECTORY_idDIRECTORY, callback) {
-        db.query('SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?',
+
+        db.query(
+            'SELECT 1 FROM permission WHERE user_id = ? AND DIRECTORY_idDIRECTORY = ?',
             [owner_id, DIRECTORY_idDIRECTORY],
-            callback);
+            (err, results) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (results.length > 0) {
+                    // Shared directory, fetch files only using the directoryID
+                    db.query(
+                        'SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE DIRECTORY_idDIRECTORY = ?',
+                        [DIRECTORY_idDIRECTORY],
+                        callback
+                    );
+                } else {
+                    // Not a shared directory, fetch files normally
+                    db.query(
+                        'SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?',
+                        [owner_id, DIRECTORY_idDIRECTORY],
+                        callback
+                    );
+                }
+            }
+        );
+        // db.query('SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?',
+        //     [owner_id, DIRECTORY_idDIRECTORY],
+        //     callback);
     }
     //download file by id
     static getFileLocationById(fileID, callback) {

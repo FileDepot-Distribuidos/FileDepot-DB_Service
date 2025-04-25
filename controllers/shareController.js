@@ -47,6 +47,21 @@ exports.getSharedFiles = (req, res) => {
     });
 };
 
+exports.getSharedDirs = (req, res) => {
+
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ error: 'No se recibio el ID del usuario' });
+    }
+
+    Share.getDirs(id, (err, dirs) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error al obtener las carpetas compartidas', details: err });
+        }
+        res.json(dirs);
+    });
+};
 
 // Revocar acceso a un archivo
 exports.revokeAccess = (req, res) => {

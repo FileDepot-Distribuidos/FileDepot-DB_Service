@@ -1,43 +1,47 @@
 const db = require('../config/db');
 
 class Share {
-    // Otorgar acceso (crear un permiso)
     static grantAccess(user_id, file_id, callback) {
         console.log("Datos para otorgar acceso:", user_id, file_id);
 
         const query = `
             INSERT INTO permission (user_id, type, FILE_idFILE)
-            VALUES (?, 'LECTURA', ?)
+            VALUES (?, 'ARCHIVO', ?)
         `;
         db.query(query, [user_id, file_id], callback);
     }
 
-    // Otorgar acceso (crear un permiso)
     static grantAccessDir(user_id, idDIRECTORY, callback) {
         console.log("Datos para otorgar acceso:", user_id, idDIRECTORY);
 
-        const getFilesQuery = `
-                SELECT idFILE FROM file
-                WHERE DIRECTORY_idDIRECTORY = ?
-            `;
-        db.query(getFilesQuery, [idDIRECTORY], (err, results) => {
-            if (err) {
-                return callback(err);
-            }
+        const insertDirectoryPermissionQuery = `
+            INSERT INTO permission (user_id, type, DIRECTORY_idDIRECTORY)
+            VALUES (?, 'DIRECTORIO', ?)
+        `;
+        db.query(insertDirectoryPermissionQuery, [user_id, idDIRECTORY], callback);
 
-            const fileIds = results.map(row => row.idFILE);
-            if (fileIds.length === 0) {
-                return callback(null, { message: 'No hay archivos en el directorio' });
-            }
+        // const getFilesQuery = `
+        //         SELECT idFILE FROM file
+        //         WHERE DIRECTORY_idDIRECTORY = ?
+        //     `;
+        // db.query(getFilesQuery, [idDIRECTORY], (err, results) => {
+        //     if (err) {
+        //         return callback(err);
+        //     }
 
-            const insertQuery = `
-                    INSERT INTO permission (user_id, type, FILE_idFILE)
-                    VALUES ${fileIds.map(() => '(?, "LECTURA", ?)').join(', ')}
-                `;
-            const insertValues = fileIds.flatMap(fileId => [user_id, fileId]);
+        //     const fileIds = results.map(row => row.idFILE);
+        //     if (fileIds.length === 0) {
+        //         return callback(null, { message: 'No hay archivos en el directorio' });
+        //     }
 
-            db.query(insertQuery, insertValues, callback);
-        });
+        //     const insertQuery = `
+        //             INSERT INTO permission (user_id, type, FILE_idFILE)
+        //             VALUES ${fileIds.map(() => '(?, "LECTURA", ?)').join(', ')}
+        //         `;
+        //     const insertValues = fileIds.flatMap(fileId => [user_id, fileId]);
+
+        //     db.query(insertQuery, insertValues, callback);
+        // });
     }
 
     // Obtener archivos compartidos de un usuario
@@ -49,6 +53,18 @@ class Share {
             INNER JOIN permission p ON f.idFILE = p.FILE_idFILE
             WHERE p.user_id = ?
         `;
+        db.query(query, [user_id], callback);
+    }
+
+    // Obtener carpetas compartidas de un usuario
+    static getDirs(user_id, callback) {
+
+        const query = `
+                SELECT d.*
+                FROM directory d
+                INNER JOIN permission p ON d.idDIRECTORY = p.DIRECTORY_idDIRECTORY
+                WHERE p.user_id = ?
+            `;
         db.query(query, [user_id], callback);
     }
 

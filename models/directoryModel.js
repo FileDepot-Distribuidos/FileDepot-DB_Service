@@ -28,10 +28,36 @@ class Directory {
     }
 
     static getByDir(owner_id, DIRECTORY_idDIRECTORY, callback) {
-        const query = `
-            SELECT * FROM directory WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?
-        `;
-        db.query(query, [owner_id, DIRECTORY_idDIRECTORY], callback);
+        // const query = `
+        //     SELECT * FROM directory WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?
+        // `;
+        // db.query(query, [owner_id, DIRECTORY_idDIRECTORY], callback);
+
+        db.query(
+            'SELECT 1 FROM permission WHERE user_id = ? AND DIRECTORY_idDIRECTORY = ?',
+            [owner_id, DIRECTORY_idDIRECTORY],
+            (err, results) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (results.length > 0) {
+                    // Shared directory, fetch dirs only using the directoryID
+                    db.query(
+                        'SELECT * FROM directory WHERE DIRECTORY_idDIRECTORY = ?',
+                        [DIRECTORY_idDIRECTORY],
+                        callback
+                    );
+                } else {
+                    // Not a shared directory, fetch dirs normally
+                    db.query(
+                        'SELECT * FROM directory WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?',
+                        [owner_id, DIRECTORY_idDIRECTORY],
+                        callback
+                    );
+                }
+            }
+        );
     }
 
 

@@ -35,6 +35,7 @@ router.get('/directorio/path/:path', directoryController.getDirectoryByPath);
 router.post('/shareFile', shareController.grantAccess);
 router.post('/shareDirectory', shareController.grantAccessDir);
 router.get('/shared/:id', shareController.getSharedFiles);
+router.get('/sharedDirs/:id', shareController.getSharedDirs);
 router.delete('/revoke', shareController.revokeAccess);
 router.get('/permissions/:file_id', shareController.getFilePermissions);
 
