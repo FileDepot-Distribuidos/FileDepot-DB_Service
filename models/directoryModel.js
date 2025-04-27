@@ -10,6 +10,18 @@ class Directory {
         `;
         db.query(query, [path, creation_date, owner_id, parent_directory_id], callback);
     }
+
+    static getAllDirectories() {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT * FROM directory', (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+    }
     
     static getRootDirectoryByUser(userId, callback) {
         const query = `
@@ -42,14 +54,12 @@ class Directory {
                 }
 
                 if (results.length > 0) {
-                    // Shared directory, fetch dirs only using the directoryID
                     db.query(
                         'SELECT * FROM directory WHERE DIRECTORY_idDIRECTORY = ?',
                         [DIRECTORY_idDIRECTORY],
                         callback
                     );
                 } else {
-                    // Not a shared directory, fetch dirs normally
                     db.query(
                         'SELECT * FROM directory WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?',
                         [owner_id, DIRECTORY_idDIRECTORY],
@@ -74,11 +84,6 @@ class Directory {
             WHERE idDIRECTORY = ?
         `;
         db.query(query, [newParentId, newFullPath, id], (err, result) => {
-            console.log("📤 UPDATE ejecutado con valores:");
-            console.log("→ newParentId:", newParentId);
-            console.log("→ newFullPath:", newFullPath);
-            console.log("→ id:", id);
-            console.log("🧾 Resultado:", result);
             callback(err, result);
         });
     }
@@ -94,7 +99,6 @@ class Directory {
     static getById(id, callback) {
         const query = `SELECT * FROM directory WHERE idDIRECTORY = ?`;
         db.query(query, [id], (err, results) => {
-            console.log("🧪 Resultado crudo del query:", results);
             callback(err, results);
         });
     }

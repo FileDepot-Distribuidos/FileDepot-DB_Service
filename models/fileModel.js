@@ -9,6 +9,18 @@ class File {
         );
     }
 
+    static getAllFiles() {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT * FROM file', (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+    }
+
     static delete(id, callback) {
 
         db.query('DELETE FROM permission WHERE FILE_idFILE = ?', [id], (err) => {
@@ -81,14 +93,12 @@ class File {
                 }
 
                 if (results.length > 0) {
-                    // Shared directory, fetch files only using the directoryID
                     db.query(
                         'SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE DIRECTORY_idDIRECTORY = ?',
                         [DIRECTORY_idDIRECTORY],
                         callback
                     );
                 } else {
-                    // Not a shared directory, fetch files normally
                     db.query(
                         'SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?',
                         [owner_id, DIRECTORY_idDIRECTORY],

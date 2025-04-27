@@ -2,22 +2,12 @@ const { log } = require('console');
 const File = require('../models/fileModel');
 const Directory = require('../models/directoryModel');
 
-// Crear archivo
 exports.uploadFile = (req, res) => {
     let { name, type, size, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY } = req.body;
 
     owner_id = parseInt(owner_id);
     NODE_idNODE = parseInt(NODE_idNODE);
     DIRECTORY_idDIRECTORY = parseInt(DIRECTORY_idDIRECTORY);
-
-    console.log('👉 Datos recibidos en body:');
-    console.log('  name:', name);
-    console.log('  type:', type);
-    console.log('  size:', size);
-    console.log('  hash:', hash);
-    console.log('  owner_id (parsed):', owner_id);
-    console.log('  NODE_idNODE (parsed):', NODE_idNODE);
-    console.log('  DIRECTORY_idDIRECTORY (parsed):', DIRECTORY_idDIRECTORY);
 
     const creation_date = new Date();
     const last_modified = creation_date;
@@ -40,8 +30,6 @@ exports.uploadFile = (req, res) => {
     );
 };
 
-
-// Eliminar archivo por ID
 exports.deleteFile = (req, res) => {
     const { id } = req.params;
     console.log("ID recibido para eliminar:", req.params.id);
@@ -78,8 +66,6 @@ exports.getFileById = (req, res) => {
     });
 };
 
-
-// Renombrar archivo
 exports.renameFile = (req, res) => {
     const { oldFileName, newFileName } = req.body;
 
@@ -92,7 +78,6 @@ exports.renameFile = (req, res) => {
     });
 };
 
-// Mover archivo a otro directorio
 exports.moveFile = (req, res) => {
     const { fileID, newDirectoryId } = req.body;
 
@@ -146,7 +131,6 @@ exports.getFiles = (req, res) => {
     });
 };
 
-//Descargar archivo por ID
 exports.downloadFile = (req, res) => {
     const fileID = parseInt(req.params.fileId);
 
@@ -163,11 +147,8 @@ exports.downloadFile = (req, res) => {
         }
     
         const file = results[0];
-    
-        // Mostrar en consola
         console.log(' Resultado de la consulta:', file);
     
-        // Devolver la respuesta, pero falta concatenar el nombre del archivo al directorio
         res.json({
             success: true,
             fileID: file.file_id,
