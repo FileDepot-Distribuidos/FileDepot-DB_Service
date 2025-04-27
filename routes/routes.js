@@ -4,7 +4,9 @@ const fileController = require('../controllers/fileController');
 const nodeController = require('../controllers/nodeController');
 const directoryController = require('../controllers/directoryController');
 const shareController = require('../controllers/shareController');
+const structureController = require('../controllers/structureController');
 
+router.get('/structure', structureController.getStructure);
 
 // Files
 router.post('/upload', fileController.uploadFile);

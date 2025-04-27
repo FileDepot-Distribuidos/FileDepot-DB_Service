@@ -124,18 +124,13 @@ exports.renameDirectory = (req, res) => {
 exports.moveDirectory = (req, res) => {
     const { id, newParentId, newFullPath } = req.body;
 
-    console.log("🔁 [moveDirectory]");
-    console.log("ID:", id);
-    console.log("newParentId:", newParentId);
-    console.log("newFullPath:", newFullPath);
-
     Directory.move(id, newParentId, newFullPath, (err, result) => {
         if (err) {
-            console.error("❌ Error al mover directorio:", err);
+            console.error("Error al mover directorio:", err);
             return res.status(500).json({ error: 'Error al mover directorio', details: err });
         }
 
-        console.log("✅ Resultado de UPDATE:", result);
+        console.log("Resultado de UPDATE:", result);
         res.json({ message: 'Directorio movido correctamente' });
     });
 };
@@ -167,20 +162,18 @@ exports.getDirectoryById = (req, res) => {
 exports.getDirectoryByPath = (req, res) => {
     let path = decodeURIComponent(req.params.path);
 
-    console.log("📥 [GET /directory/by-path/:path] Path recibido (decodificado):", path);
-
     Directory.getByPath(path, (err, results) => {
         if (err) {
-            console.error("❌ Error al buscar path en la base de datos:", err);
+            console.error("Error al buscar path en la base de datos:", err);
             return res.status(500).json({ error: 'Error al buscar por path' });
         }
 
         if (results.length === 0) {
-            console.warn("⚠️ No se encontró el directorio con path:", path);
+            console.warn("No se encontró el directorio con path:", path);
             return res.status(404).json({ error: 'Directorio no encontrado' });
         }
 
-        console.log("✅ Directorio encontrado:", results[0]);
+        console.log("Directorio encontrado:", results[0]);
         res.json({ directoryId: results[0].idDIRECTORY });
     });
 };

@@ -1,4 +1,3 @@
-// controllers/nodeController.js
 const Node = require('../models/nodeModel');
 
 exports.registerNode = (req, res) => {
