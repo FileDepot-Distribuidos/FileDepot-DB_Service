@@ -3,17 +3,18 @@ const File = require('../models/fileModel');
 const Directory = require('../models/directoryModel');
 
 exports.uploadFile = (req, res) => {
-    let { name, type, size, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY } = req.body;
+    let { name, type, bytes, hash, owner_id, original_idNODE, copy_idNODE, DIRECTORY_idDIRECTORY } = req.body;
 
     owner_id = parseInt(owner_id);
-    NODE_idNODE = parseInt(NODE_idNODE);
-    DIRECTORY_idDIRECTORY = parseInt(DIRECTORY_idDIRECTORY);
+    original_idNODE = parseInt(original_idNODE);
+    copy_idNODE = parseInt(copy_idNODE);
+    DIRECTORY_idDIRECTORY = parseInt(DIRECTORY_idDIRECTORY);    
 
     const creation_date = new Date();
     const last_modified = creation_date;
 
     File.create(
-        { name, type, size, creation_date, last_modified, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY },
+        { name, type, bytes, creation_date, last_modified, hash, owner_id, original_idNODE, copy_idNODE, DIRECTORY_idDIRECTORY },
         (err, result) => {
             if (err) {
                 console.error('Error al registrar el archivo en la base de datos:', err);

@@ -1,10 +1,10 @@
 const db = require('../config/db');
 
 class File {
-    static create({ name, type, size, creation_date, last_modified, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY }, callback) {
+    static create({ name, type, bytes, creation_date, last_modified, hash, owner_id, original_idNODE, copy_idNODE, DIRECTORY_idDIRECTORY }, callback) {
         db.query(
-            'INSERT INTO file (name, type, size, creation_date, last_modified, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [name, type, size, creation_date, last_modified, hash, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY],
+            'INSERT INTO file (name, type, bytes, creation_date, last_modified, hash, owner_id, original_idNODE, copy_idNODE, DIRECTORY_idDIRECTORY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [name, type, bytes, creation_date, last_modified, hash, owner_id, original_idNODE, copy_idNODE, DIRECTORY_idDIRECTORY],
             callback
         );
     }
@@ -94,13 +94,13 @@ class File {
 
                 if (results.length > 0) {
                     db.query(
-                        'SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE DIRECTORY_idDIRECTORY = ?',
+                        'SELECT idFILE, name, type, bytes, creation_date, last_modified, owner_id, original_idNODE, copy_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE DIRECTORY_idDIRECTORY = ?',
                         [DIRECTORY_idDIRECTORY],
                         callback
                     );
                 } else {
                     db.query(
-                        'SELECT idFILE, name, type, size, creation_date, last_modified, owner_id, NODE_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?',
+                        'SELECT idFILE, name, type, bytes, creation_date, last_modified, owner_id, original_idNODE, copy_idNODE, DIRECTORY_idDIRECTORY FROM file WHERE owner_id = ? AND DIRECTORY_idDIRECTORY = ?',
                         [owner_id, DIRECTORY_idDIRECTORY],
                         callback
                     );

@@ -23,3 +23,13 @@ exports.registerNode = (req, res) => {
         return res.status(201).json({ message: 'Nodo registrado correctamente', id: result.insertId });
     });
 };
+
+exports.getAllNodes = (req, res) => {
+    Node.find({}, (err, nodes) => {
+        if (err) {
+            console.error('Error al obtener los nodos de la base de datos:', err);
+            return res.status(500).json({ error: 'Error del servidor' });
+        }
+        return res.status(200).json(nodes);
+    });
+};
