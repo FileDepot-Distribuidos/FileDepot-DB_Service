@@ -5,7 +5,37 @@ class File {
         db.query(
             'INSERT INTO file (name, type, bytes, creation_date, last_modified, hash, owner_id, original_idNODE, copy_idNODE, DIRECTORY_idDIRECTORY) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [name, type, bytes, creation_date, last_modified, hash, owner_id, original_idNODE, copy_idNODE, DIRECTORY_idDIRECTORY],
-            callback
+            (err, results) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                const updateNodeSizeQuery = `
+                    UPDATE node 
+                    SET available_size_bytes = available_size_bytes - ? 
+                    WHERE idNODE = ?
+                `;
+
+                // Update original node size
+                db.query(updateNodeSizeQuery, [bytes, original_idNODE], (err) => {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    // If copy_idNODE exists, update its size as well
+                    if (copy_idNODE) {
+                        db.query(updateNodeSizeQuery, [bytes, copy_idNODE], (err) => {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            callback(null, results);
+                        });
+                    } else {
+                        callback(null, results);
+                    }
+                });
+            }
         );
     }
 
