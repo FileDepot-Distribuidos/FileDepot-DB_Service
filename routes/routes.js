@@ -20,6 +20,7 @@ router.get('/download/:fileId', fileController.downloadFile);
 
 // Nodos
 router.post('/node', nodeController.registerNode);
+router.get('/nodes', nodeController.getAllNodes);
 
 // Directorios
 router.post('/directory', directoryController.createDirectory);
