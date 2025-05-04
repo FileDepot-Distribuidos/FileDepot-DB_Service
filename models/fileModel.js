@@ -155,7 +155,7 @@ class File {
             JOIN 
                 DIRECTORY d ON f.DIRECTORY_idDIRECTORY = d.idDIRECTORY
             JOIN 
-                NODE n ON f.NODE_idNODE = n.idNODE
+                NODE n ON f.original_idNODE = n.idNODE
             WHERE 
                 f.idFILE = ?
         `;
